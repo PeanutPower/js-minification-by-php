@@ -1,16 +1,34 @@
 <?
+/*
+* Copyright (c) 2012 Vladimir Troyanenko  (post@itman.ru)
+*
+* @license http://opensource.org/licenses/mit-license.php MIT License
+* @link https://github.com/non4me/js-minification-by-php/
+*
+* Usage:
+* <?
+* include_once($_SERVER['DOCUMENT_ROOT']."/m_.php");
+* $include_js[] = "/js/1.js";
+* $include_js[] = "/js/2.js";
+* $include_js[] = "/styles/1.css";
+* $include_js[] = "/styles/2.css";
+* minify_get_link( $include_js );
+* ?>
+*
+*/
+
 $minify_level = isset($minify_level) ? $minify_level : 2;
 /*
-$minify_level = 0 - no minify, no obfuscator
-$minify_level = 1 - minify, no obfuscator
-$minify_level = 2 - minify, obfuscator
-$minify_level = 3 - no minify, obfuscator
+* $minify_level = 0 - no minify, no obfuscator
+* $minify_level = 1 - minify, no obfuscator
+* $minify_level = 2 - minify, obfuscator
+* $minify_level = 3 - no minify, obfuscator
 */
 
 $intminify = isset($intminify) ? $intminify : true;
 /*
-$intminify = true - ise internal function;
-$intminify = false - ise external class (http://github.com/rgrove/jsmin-php/)
+* $intminify = true - ise internal function;
+* $intminify = false - ise external class (http://github.com/rgrove/jsmin-php/)
 */
 
 if(realpath(__FILE__) == realpath($_SERVER['SCRIPT_FILENAME']))
@@ -51,7 +69,7 @@ if(realpath(__FILE__) == realpath($_SERVER['SCRIPT_FILENAME']))
 function minify_get_link($urls)
 {
 	global $minify_level, $intminify;
-	$mainuri 	 = "http://www.yonad.".eregi_replace(".*\.(.*)$","\\1",$_SERVER['HTTP_HOST']);
+	$mainuri 	 = "http://www.YourSiteName.".eregi_replace(".*\.(.*)$","\\1",$_SERVER['HTTP_HOST']);
 	$root 		 = $_SERVER['DOCUMENT_ROOT'];
 	$mdf  		 = "";
 	$cashdir 	 = realpath($_SERVER['DOCUMENT_ROOT'])."/m_";
@@ -335,28 +353,24 @@ function obfuscator($text)
 			$f = preg_replace("~\\\'~","OnEqUoTe",$f);
 			$f = preg_replace('~\\\"~',"DbLqUoTe",$f);		
 			preg_match_all('~([\'\"]).*\1~U', $f, $quotes);
-	//print_r($quotes);
+
 			$nextquote = 0;
 			foreach($quotes[0] as $quote)
 			{
-	//echo ":>:: ".$quote."\n";
+
 				$quote = addcslashes($quote,'\^$.[]|()?*{}-');
-	//echo ":<:: ".$quote."\n";
 				$nextquote++;	
 				$f = preg_replace("@$quote@","-_-".$nextquote."-_-",$f);
-	//echo "<.< ".$f."\n";
 			}
 			
 			if(count($rvars))
 			{
-	//print_r($rvars);
 				foreach($rvars as $from => $to)
 				{
 					//echo "from: ".$from."\n";
 					if( strlen($from) > 2 ) $f = preg_replace("@\b$from\b@","$to",$f);
 				}
 			}
-	//print_r($quotes);
 			// additional safe strip spaces
 			$f = preg_replace("~\s(\W)~","\\1",$f);
 			$f = preg_replace("~(\W) ~U","\\1",$f);
@@ -369,9 +383,6 @@ function obfuscator($text)
 			}
 			$f = preg_replace('~DbLqUoTe~','\"',$f);
 			$f = preg_replace("~OnEqUoTe~","\'",$f);
-	//echo "<<<";		
-	//echo "<<< ".$f."\n";		
-	
 		}
 		$nf.= $f;
 	}
